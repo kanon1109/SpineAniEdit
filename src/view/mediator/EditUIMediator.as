@@ -6,6 +6,7 @@ package view.mediator
 	import componets.Alert;
 	import componets.Image;
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
@@ -44,6 +45,7 @@ package view.mediator
 		private var resFile:File;
 		private var imageFile:File;
 		private var saveFile:File;
+		private var importFile:File;
 		private var dataFile:File;
 		private var resPath:String = "res"
 		private var editUI:EditUI;
@@ -540,6 +542,7 @@ package view.mediator
 			{
 				var type:String;
 				dp = Layer.ANI_STAGE.getChildAt(i);
+				if (DisplayObjectContainer(dp).numChildren == 0) continue;
 				if (dp is SpineAni)
 				{
 					type = "spine";
@@ -569,6 +572,7 @@ package view.mediator
 			for (i = 0; i < num; i++)
 			{
 				dp = Layer.ANI_STAGE.getChildAt(i);
+				if (DisplayObjectContainer(dp).numChildren == 0) continue;
 				var node:Object = {};
 				if (dp is SpineAni)
 				{
@@ -610,20 +614,33 @@ package view.mediator
 			}
 			this.saveDataStr = JSON.stringify(arr);
 			trace(this.saveDataStr);
-			if (!this.saveFile)
+			if (!isExport)
 			{
-				this.saveFile = File.desktopDirectory;
-				this.saveFile.addEventListener(Event.SELECT, selectSaveFileHandler);
-				this.saveFile.url += ".json"; //确认后缀名
+				if (!this.saveFile)
+				{
+					this.saveFile = File.desktopDirectory;
+					this.saveFile.addEventListener(Event.SELECT, selectSaveFileHandler);
+					this.saveFile.url += ".json"; //确认后缀名
+				}
+				this.saveFile.browseForSave("保存数据");
 			}
-			this.saveFile.browseForSave("保存数据");
+			else
+			{
+				if (!this.importFile)
+				{
+					this.importFile = File.desktopDirectory;
+					this.importFile.addEventListener(Event.SELECT, selectSaveFileHandler);
+					this.importFile.url += ".json"; //确认后缀名
+				}
+				this.importFile.browseForSave("导出数据");
+			}
 		}
 		
 		private function selectSaveFileHandler(event:Event):void
 		{
-			trace(this.resFile.name, this.resFile.nativePath);
+			var file:File = event.currentTarget as File;
 			var stream:FileStream = new FileStream();
-			stream.open(this.saveFile, FileMode.WRITE);
+			stream.open(file, FileMode.WRITE);
 			stream.writeUTFBytes(this.saveDataStr);
 			stream.close();
 		}
