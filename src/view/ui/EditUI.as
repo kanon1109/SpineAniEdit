@@ -36,6 +36,7 @@ public class EditUI extends Sprite
 	public var clearBtn:PushButton;
 	public var exportBtn:PushButton;
 	public var resetBtn:PushButton;
+	public var stageBtn:PushButton;
 	public var transfromCb:CheckBox;
 	public var transformTool:TransformTool;
 	public var scaleXTxt:InputText;
@@ -139,6 +140,9 @@ public class EditUI extends Sprite
 		this.clearBtn = new PushButton(topGroup, 0, 0, "清理");
 		this.clearBtn.setSize(this.openBtn.width, this.openBtn.height);
 		
+		this.stageBtn = new PushButton(topGroup, 0, 0, "舞台大小");
+		this.stageBtn.setSize(this.openBtn.width, this.openBtn.height);
+		
 		this.ctrlBox = new HBox(ctrlPanel);
 		this.ctrlBox.alignment = HBox.MIDDLE;
 		var scaleXLabel:Label = new Label(this.ctrlBox, 0, 0, "scaleX");
@@ -194,13 +198,13 @@ public class EditUI extends Sprite
 		this.aniCheckBox = new CheckBox(ctrlBox, 0, 0, "是否循环");
 		this.aniCheckBox.selected = true;
 		
-		Layer.CANVAS.graphics.lineStyle(1, 0x000000, 1);
-		Layer.CANVAS.graphics.moveTo(rootGroup.x, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
-		Layer.CANVAS.graphics.lineTo(rootGroup.x + this.aniPanel.width, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
+		Layer.CANVAS_CENTER_POS.graphics.lineStyle(1, 0x000000, 1);
+		Layer.CANVAS_CENTER_POS.graphics.moveTo(rootGroup.x, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
+		Layer.CANVAS_CENTER_POS.graphics.lineTo(rootGroup.x + this.aniPanel.width, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
 		
-		Layer.CANVAS.graphics.lineStyle(1, 0x000000, 1);
-		Layer.CANVAS.graphics.moveTo(rootGroup.x + this.aniPanel.width / 2, rootGroup.y + topPanel.height + rootGroup.spacing);
-		Layer.CANVAS.graphics.lineTo(rootGroup.x + this.aniPanel.width / 2, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height);
+		Layer.CANVAS_CENTER_POS.graphics.lineStyle(1, 0x000000, 1);
+		Layer.CANVAS_CENTER_POS.graphics.moveTo(rootGroup.x + this.aniPanel.width / 2, rootGroup.y + topPanel.height + rootGroup.spacing);
+		Layer.CANVAS_CENTER_POS.graphics.lineTo(rootGroup.x + this.aniPanel.width / 2, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height);
 		
 		this._centerPos = new Point(rootGroup.x + this.aniPanel.width / 2, 
 									rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);

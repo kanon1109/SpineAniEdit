@@ -28,6 +28,7 @@ package view.mediator
 	import utils.Cookie;
 	import view.ani.SpineAni;
 	import view.ui.EditUI;
+	import view.ui.StageSizeWindow;
 	
 	/**
 	 * ...TODO
@@ -49,13 +50,15 @@ package view.mediator
 		private var dataFile:File;
 		private var resPath:String = "res"
 		private var editUI:EditUI;
+		private var stageSizeWin:StageSizeWindow;
 		private var pathList:Array;
 		private var curSpt:Sprite;
 		private var dataLoader:URLLoader;
 		private var imageFilter:FileFilter;
 		private var dataFilter:FileFilter;
 		private var saveDataStr:String;
-		
+		private var stageWidth:Number = 200;
+		private var stageHeight:Number = 200;
 		public function EditUIMediator()
 		{
 			super(NAME);
@@ -73,6 +76,7 @@ package view.mediator
 			case Message.START: 
 				this.initEvent();
 				this.initRes();
+				this.updateStage();
 				Layer.ANI_STAGE.x = this.editUI.centerPos.x;
 				Layer.ANI_STAGE.y = this.editUI.centerPos.y;
 				break;
@@ -87,6 +91,18 @@ package view.mediator
 				this.editUI.showOutput(String(notification.getBody()));
 				break;
 			}
+		}
+		
+		private function updateStage():void 
+		{
+			Layer.CANVAS_STAGE.graphics.clear();
+			Layer.CANVAS_STAGE.graphics.lineStyle(1, 0xFFFFFF, 1);
+			Layer.CANVAS_STAGE.graphics.beginFill(0xFFFFFF, .3);
+			Layer.CANVAS_STAGE.graphics.moveTo(this.editUI.centerPos.x - this.stageWidth / 2, this.editUI.centerPos.y - this.stageHeight / 2);
+			Layer.CANVAS_STAGE.graphics.lineTo(this.editUI.centerPos.x + this.stageWidth / 2, this.editUI.centerPos.y - this.stageHeight / 2);
+			Layer.CANVAS_STAGE.graphics.lineTo(this.editUI.centerPos.x + this.stageWidth / 2, this.editUI.centerPos.y + this.stageHeight / 2);
+			Layer.CANVAS_STAGE.graphics.lineTo(this.editUI.centerPos.x - this.stageWidth / 2, this.editUI.centerPos.y + this.stageHeight / 2);
+			Layer.CANVAS_STAGE.graphics.endFill();
 		}
 		
 		/**
@@ -109,6 +125,7 @@ package view.mediator
 			this.editUI.transfromCb.addEventListener(MouseEvent.CLICK, transfromCbClickHandler);
 			this.editUI.clearBtn.addEventListener(MouseEvent.CLICK, clearBtnHandler);
 			this.editUI.resetBtn.addEventListener(MouseEvent.CLICK, resetBtnHandler);
+			this.editUI.stageBtn.addEventListener(MouseEvent.CLICK, stageBtnHandler);
 			
 			this.editUI.scaleXTxt.addEventListener(FocusEvent.FOCUS_OUT, scaleXTxtfocusOutHandler);
 			this.editUI.posXTxt.addEventListener(FocusEvent.FOCUS_OUT, posXTxtfocusOutHandler);
@@ -124,6 +141,48 @@ package view.mediator
 			
 			Layer.STAGE.addEventListener(KeyboardEvent.KEY_UP, onKeyUpHandler);
 			Layer.STAGE.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDownHandler);
+		}
+		
+		private function stageBtnHandler(event:MouseEvent):void 
+		{
+			if (!this.stageSizeWin)
+			{
+				this.stageSizeWin = new StageSizeWindow();
+				this.stageSizeWin.updateStageSize(this.stageWidth, this.stageHeight);
+				this.stageSizeWin.x = this.editUI.centerPos.x;
+				this.stageSizeWin.y = this.editUI.centerPos.y;
+				this.stageSizeWin.addEventListener(Event.CLOSE, stageSizeWinCloseHandler);
+				this.stageSizeWin.confirmBtn.addEventListener(MouseEvent.CLICK, stageSizeWinConfirmBtnClickHandler);
+				this.stageSizeWin.resetBtn.addEventListener(MouseEvent.CLICK, stageSizeWinResetBtnClickHandler);
+				Layer.WINDOWS.addChild(this.stageSizeWin);
+			}
+		}
+		
+		private function stageSizeWinResetBtnClickHandler(event:MouseEvent):void 
+		{
+			this.stageWidth = 200;
+			this.stageHeight = 200;
+			this.stageSizeWin.updateStageSize(this.stageWidth, this.stageHeight);
+			this.updateStage();
+		}
+		
+		private function stageSizeWinConfirmBtnClickHandler(event:Event):void 
+		{
+			this.stageWidth = Number(this.stageSizeWin.widthTxt.text);
+			this.stageHeight = Number(this.stageSizeWin.heightTxt.text);
+			this.stageSizeWin.close();
+			this.updateStage();
+		}
+		
+		private function stageSizeWinCloseHandler(event:Event):void 
+		{
+			if (this.stageSizeWin && 
+				this.stageSizeWin.parent)
+			{
+				this.stageSizeWin.confirmBtn.removeEventListener(MouseEvent.CLICK, stageSizeWinConfirmBtnClickHandler);
+				this.stageSizeWin.removeEventListener(Event.CLOSE, stageSizeWinCloseHandler);
+				this.stageSizeWin = null;
+			}
 		}
 		
 		private function stageMouseDownHandler(event:MouseEvent):void
@@ -538,6 +597,11 @@ package view.mediator
 			var name:String;
 			var jsonName:String;
 			var resName:String;
+			var node:Object = {};
+			node.type = "stage";
+			node.stageWidth = this.stageWidth;
+			node.stageHeight = this.stageHeight;
+			arr.push(node);
 			for (var i:int = 0; i < num; i++)
 			{
 				var type:String;
@@ -687,45 +751,54 @@ package view.mediator
 			for (var i:int = 0; i < num; i++)
 			{
 				var data:Object = arr[i];
-				var x:Number = data.x;
-				var y:Number = data.y;
-				var scaleX:Number = data.scaleX;
-				var scaleY:Number = data.scaleY;
-				var rotation:Number = data.rotation;
-				var depth:int = data.orderZ;
-				if (y > 0) y = -Math.abs(y);
-				else y = Math.abs(y);
-				if (data.type == "spine")
+				if (data.type != "stage")
 				{
-					var spAni:SpineAni = new SpineAni();
-					spAni.addEventListener(Event.COMPLETE, spAniLoadCompleteHandler);
-					spAni.addEventListener(ErrorEvent.ERROR, spAniLoadErrorCompleteHandler);
-					spAni.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
-					spAni.loadSpine(data.png, data.atlas, data.json, data.path);
-					spAni.pathName = data.path;
-					spAni.scaleX = scaleX;
-					spAni.scaleY = scaleY;
-					spAni.rotation = rotation;
-					spAni.x = x;
-					spAni.y = y;
-					spAni.animationName = data.animationName;
-					spAni.isLoop = data.isLoop;
-					Layer.ANI_STAGE.addChild(spAni);
+					var x:Number = data.x;
+					var y:Number = data.y;
+					var scaleX:Number = data.scaleX;
+					var scaleY:Number = data.scaleY;
+					var rotation:Number = data.rotation;
+					var depth:int = data.orderZ;
+					if (y > 0) y = -Math.abs(y);
+					else y = Math.abs(y);
+					if (data.type == "spine")
+					{
+						var spAni:SpineAni = new SpineAni();
+						spAni.addEventListener(Event.COMPLETE, spAniLoadCompleteHandler);
+						spAni.addEventListener(ErrorEvent.ERROR, spAniLoadErrorCompleteHandler);
+						spAni.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
+						spAni.loadSpine(data.png, data.atlas, data.json, data.path);
+						spAni.pathName = data.path;
+						spAni.scaleX = scaleX;
+						spAni.scaleY = scaleY;
+						spAni.rotation = rotation;
+						spAni.x = x;
+						spAni.y = y;
+						spAni.animationName = data.animationName;
+						spAni.isLoop = data.isLoop;
+						Layer.ANI_STAGE.addChild(spAni);
+					}
+					else if (data.type == "img")
+					{
+						var image:Image = new Image();
+						image.resName = data.png;
+						image.pathName = data.path;
+						image.load(data.path);
+						image.x = x;
+						image.y = y;
+						image.scaleX = scaleX;
+						image.scaleY = scaleY;
+						image.rotation = rotation;
+						Layer.ANI_STAGE.addChild(image);
+						image.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
+						image.addEventListener(IOErrorEvent.IO_ERROR, loadImageErrorHandler);
+					}
 				}
 				else
 				{
-					var image:Image = new Image();
-					image.resName = data.png;
-					image.pathName = data.path;
-					image.load(data.path);
-					image.x = x;
-					image.y = y;
-					image.scaleX = scaleX;
-					image.scaleY = scaleY;
-					image.rotation = rotation;
-					Layer.ANI_STAGE.addChild(image);
-					image.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
-					image.addEventListener(IOErrorEvent.IO_ERROR, loadImageErrorHandler);
+					this.stageWidth = data.stageWidth;
+					this.stageHeight = data.stageHeight;
+					this.updateStage();
 				}
 			}
 		}
