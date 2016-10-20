@@ -360,6 +360,7 @@ package view.mediator
 			if (!this.resFile) return;
 			this.editUI.list.removeAll();
 			trace(this.resFile.name, this.resFile.nativePath);
+			if(!this.resFile.isDirectory) return;
 			this.pathList = this.resFile.getDirectoryListing();
 			var length:int = this.pathList.length;
 			for (var i:int = 0; i < length; i++)
