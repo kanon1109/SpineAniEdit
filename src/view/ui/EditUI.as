@@ -47,7 +47,6 @@ public class EditUI extends Sprite
 	public var aniPanel:Panel;
 	public var aniComboBox:ComboBox;
 	public var aniCheckBox:CheckBox;
-	
 	private var aniPanelWidth:int;
 	private var aniPanelHeight:int;
 	private var ctrlBox:HBox;
@@ -208,6 +207,32 @@ public class EditUI extends Sprite
 		
 		this._centerPos = new Point(rootGroup.x + this.aniPanel.width / 2, 
 									rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
+							
+		var mask:Sprite = this.createMask(centerGroup.x, 
+										  centerGroup.y, 
+										  this.aniPanelWidth, 
+										  this.aniPanelHeight);
+		Layer.ROOT.addChild(mask);
+		Layer.CANVAS.mask = mask;
+		
+		mask = this.createMask(centerGroup.x, 
+							  centerGroup.y, 
+							  this.aniPanelWidth, 
+							  this.aniPanelHeight);
+		Layer.ROOT.addChild(mask);
+		Layer.ANI_STAGE.mask = mask;
+	}
+	
+	/**
+	 * 创建遮罩							
+	 */
+	private function createMask(x:Number, y:Number, width:Number, height:Number):Sprite
+	{
+		var maskSpt:Sprite = new Sprite();
+		maskSpt.graphics.beginFill(0xFFFFFF);
+		maskSpt.graphics.drawRect(x, y, width, height);
+		maskSpt.graphics.endFill();
+		return maskSpt;
 	}
 	
 	/**

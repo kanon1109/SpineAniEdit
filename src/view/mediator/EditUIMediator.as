@@ -20,6 +20,8 @@ package view.mediator
 	import flash.net.FileFilter;
 	import flash.net.URLLoader;
 	import flash.ui.Keyboard;
+	import flash.ui.Mouse;
+	import flash.ui.MouseCursor;
 	import flash.utils.Dictionary;
 	import message.Message;
 	import org.puremvc.as3.interfaces.INotification;
@@ -57,8 +59,9 @@ package view.mediator
 		private var imageFilter:FileFilter;
 		private var dataFilter:FileFilter;
 		private var saveDataStr:String;
-		private var stageWidth:Number = 200;
-		private var stageHeight:Number = 200;
+		private var stageWidth:Number = 550;
+		private var stageHeight:Number = 600;
+		private var isOnSpaceKey:Boolean;
 		public function EditUIMediator()
 		{
 			super(NAME);
@@ -91,6 +94,27 @@ package view.mediator
 				this.editUI.showOutput(String(notification.getBody()));
 				break;
 			}
+		}
+		
+		private function aniStageMouseUp(event:MouseEvent):void 
+		{
+			Layer.ANI_STAGE.stopDrag();
+			Mouse.cursor = MouseCursor.ARROW;
+		}
+		
+		private function aniStageMouseDown(event:MouseEvent):void 
+		{
+			if (this.isOnSpaceKey) 
+			{
+				Mouse.cursor = MouseCursor.HAND;
+				Layer.ANI_STAGE.startDrag();
+			}
+		}
+		
+		private function aniStageMiddleDown(event:MouseEvent):void 
+		{
+			Layer.ANI_STAGE.startDrag();
+			Mouse.cursor = MouseCursor.HAND;
 		}
 		
 		private function updateStage():void 
@@ -141,6 +165,11 @@ package view.mediator
 			
 			Layer.STAGE.addEventListener(KeyboardEvent.KEY_UP, onKeyUpHandler);
 			Layer.STAGE.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDownHandler);
+			
+			Layer.ANI_STAGE.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, aniStageMiddleDown);
+			Layer.ANI_STAGE.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, aniStageMouseUp);
+			Layer.ANI_STAGE.addEventListener(MouseEvent.MOUSE_DOWN, aniStageMouseDown);
+			Layer.ANI_STAGE.addEventListener(MouseEvent.MOUSE_UP, aniStageMouseUp);
 		}
 		
 		private function stageBtnHandler(event:MouseEvent):void 
@@ -160,8 +189,8 @@ package view.mediator
 		
 		private function stageSizeWinResetBtnClickHandler(event:MouseEvent):void 
 		{
-			this.stageWidth = 200;
-			this.stageHeight = 200;
+			this.stageWidth = 550;
+			this.stageHeight = 600;
 			this.stageSizeWin.updateStageSize(this.stageWidth, this.stageHeight);
 			this.updateStage();
 		}
@@ -466,7 +495,14 @@ package view.mediator
 		private function onKeyUpHandler(event:KeyboardEvent):void
 		{
 			if (event.keyCode == Keyboard.DELETE)
+			{
 				this.removeCurSpt();
+			}
+			else if (event.keyCode == Keyboard.SPACE)
+			{
+				this.isOnSpaceKey = false;
+				Mouse.cursor = MouseCursor.ARROW;
+			}
 		}
 		
 		private function onKeyDownHandler(event:KeyboardEvent):void
@@ -475,6 +511,11 @@ package view.mediator
 				this.copy(this.curSpt);
 			else if (event.keyCode == Keyboard.ENTER)
 				this.updateSptProp();
+			else if (event.keyCode == Keyboard.SPACE)
+			{
+				this.isOnSpaceKey = true;
+				Mouse.cursor = MouseCursor.HAND;
+			}
 		}
 		
 		private function refreshBtnHandler(event:MouseEvent):void
@@ -669,6 +710,7 @@ package view.mediator
 				}
 				node.x = dp.x;
 				node.y = dp.y;
+				trace("node.x , node.y", node.x, node.y);
 				if (node.y < 0) node.y = Math.abs(node.y);
 				else node.y = -Math.abs(node.y);
 				node.scaleX = dp.scaleX;
