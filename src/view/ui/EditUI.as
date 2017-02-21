@@ -14,7 +14,6 @@ import com.senocular.display.TransformTool;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.geom.Point;
-import flash.geom.Rectangle;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import view.ani.SpineAni;
@@ -30,7 +29,8 @@ public class EditUI extends Sprite
 	public var importDataBtn:PushButton;
 	public var saveBtn:PushButton;
 	public var refreshBtn:PushButton;
-	public var depthBtn:PushButton;
+	public var highestDepthBtn:PushButton;
+	public var lowestDepthBtn:PushButton;
 	public var nextDepthBtn:PushButton;
 	public var prevDepthBtn:PushButton;
 	public var clearBtn:PushButton;
@@ -55,6 +55,10 @@ public class EditUI extends Sprite
 	//中心点位置
 	private var _centerPos:Point;
 	private var listWidth:Number;
+	//舞台位置
+	public var stageXTxt:InputText;
+	public var stageYTxt:InputText;
+	public var resetStagePosBtn:PushButton;
 	public function EditUI()
 	{
 		this.addEventListener(Event.ADDED_TO_STAGE, addToStage);
@@ -107,7 +111,8 @@ public class EditUI extends Sprite
 		this.importDataBtn = new PushButton(topGroup, 0, 0, "打开文件");
 		this.exportBtn = new PushButton(topGroup, 0, 0, "导出数据");
 		this.importBtn = new PushButton(topGroup, 0, 0, "导入图片");
-
+		this.openBtn.width = 90;
+		
 		this.openBtn.setSize(this.openBtn.width, this.openBtn.height + 8);
 		this.saveBtn.setSize(this.openBtn.width, this.openBtn.height);
 		this.exportBtn.setSize(this.openBtn.width, this.openBtn.height);
@@ -115,8 +120,10 @@ public class EditUI extends Sprite
 		this.importBtn.setSize(this.openBtn.width, this.openBtn.height);
 		this.refreshBtn.setSize(this.openBtn.width, this.openBtn.height);
 		
-		this.depthBtn = new PushButton(topGroup, 0, 0, "深度最高");
-		this.depthBtn.setSize(this.openBtn.width, this.openBtn.height);
+		this.highestDepthBtn = new PushButton(topGroup, 0, 0, "深度最高");
+		this.lowestDepthBtn = new PushButton(topGroup, 0, 0, "深度最低");
+		this.highestDepthBtn.setSize(this.openBtn.width, this.openBtn.height);
+		this.lowestDepthBtn.setSize(this.openBtn.width, this.openBtn.height);
 
 		this.nextDepthBtn = new PushButton(topGroup, 0, 0, "下一层");
 		this.nextDepthBtn.setSize(this.openBtn.width, this.openBtn.height);
@@ -135,6 +142,29 @@ public class EditUI extends Sprite
 		this.transformTool.moveEnabled = false;
 		this.transformTool.raiseNewTargets = false;
 		Layer.EDIT.addChild(this.transformTool);
+		
+		var stagePosPanel:Panel = new Panel(Layer.EDIT);
+		stagePosPanel.width = 105;
+		stagePosPanel.height = 50;
+		stagePosPanel.x = this.aniPanelWidth - stagePosPanel.width - 2;
+		stagePosPanel.y = 37;
+		
+		var stagePosLabel:Label = new Label(stagePosPanel, 0, 0, "舞台位置");
+		stagePosLabel.x = 2;
+		
+		this.stageXTxt = new InputText(stagePosPanel, 0, 25, "0");
+		this.stageXTxt.width = 50;
+		this.stageXTxt.height = 20;
+		this.stageXTxt.restrict = "0-9";
+		
+		this.stageYTxt = new InputText(stagePosPanel, 55, 25, "0");
+		this.stageYTxt.width = 50;
+		this.stageYTxt.height = 20;
+		this.stageXTxt.restrict = "0-9";
+		
+		this.resetStagePosBtn = new PushButton(stagePosPanel, 55, 0, "复位");
+		this.resetStagePosBtn.width = 50;
+		this.resetStagePosBtn.height = 20;
 		
 		this.clearBtn = new PushButton(topGroup, 0, 0, "清理");
 		this.clearBtn.setSize(this.openBtn.width, this.openBtn.height);
@@ -196,14 +226,6 @@ public class EditUI extends Sprite
 		
 		this.aniCheckBox = new CheckBox(ctrlBox, 0, 0, "是否循环");
 		this.aniCheckBox.selected = true;
-		
-		Layer.CANVAS_CENTER_POS.graphics.lineStyle(1, 0x000000, 1);
-		Layer.CANVAS_CENTER_POS.graphics.moveTo(rootGroup.x, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
-		Layer.CANVAS_CENTER_POS.graphics.lineTo(rootGroup.x + this.aniPanel.width, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
-		
-		Layer.CANVAS_CENTER_POS.graphics.lineStyle(1, 0x000000, 1);
-		Layer.CANVAS_CENTER_POS.graphics.moveTo(rootGroup.x + this.aniPanel.width / 2, rootGroup.y + topPanel.height + rootGroup.spacing);
-		Layer.CANVAS_CENTER_POS.graphics.lineTo(rootGroup.x + this.aniPanel.width / 2, rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height);
 		
 		this._centerPos = new Point(rootGroup.x + this.aniPanel.width / 2, 
 									rootGroup.y + topPanel.height + rootGroup.spacing + this.aniPanel.height / 2);
@@ -283,6 +305,17 @@ public class EditUI extends Sprite
 	
 	public function get centerPos():Point {return _centerPos; }
 
+	/**
+	 * 更新舞台位置
+	 * @param	x	x坐标
+	 * @param	y	y坐标
+	 */
+	public function updateStagePos(x:Number, y:Number):void
+	{
+		this.stageXTxt.text = x.toString();
+		this.stageYTxt.text = y.toString();
+	}
+	
 	/**
 	 * 显示输出
 	 * @param	content	内容

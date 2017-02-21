@@ -28,11 +28,11 @@ public class Layer
 		ROOT = root;
 		STAGE = root.stage;
 		
-		EDIT = new Sprite();
-		root.addChild(EDIT);
-		
 		UI = new Sprite();
 		root.addChild(UI);
+		
+		ANI_STAGE = new Sprite();
+		root.addChild(ANI_STAGE);
 		
 		CANVAS = new Sprite();
 		CANVAS.mouseChildren = false;
@@ -45,8 +45,8 @@ public class Layer
 		CANVAS_CENTER_POS = new Sprite();
 		CANVAS.addChild(CANVAS_CENTER_POS);
 		
-		ANI_STAGE = new Sprite();
-		root.addChild(ANI_STAGE);
+		EDIT = new Sprite();
+		root.addChild(EDIT);
 		
 		WINDOWS = new Sprite();
 		root.addChild(WINDOWS);
