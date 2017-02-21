@@ -10,6 +10,7 @@ import com.bit101.components.Panel;
 import com.bit101.components.PushButton;
 import com.bit101.components.Style;
 import com.bit101.components.VBox;
+import com.bit101.components.VUISlider;
 import com.senocular.display.TransformTool;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -58,6 +59,7 @@ public class EditUI extends Sprite
 	//舞台位置
 	public var stageXTxt:InputText;
 	public var stageYTxt:InputText;
+	public var vSlider:VUISlider;
 	public var resetStagePosBtn:PushButton;
 	public function EditUI()
 	{
@@ -160,11 +162,18 @@ public class EditUI extends Sprite
 		this.stageYTxt = new InputText(stagePosPanel, 55, 25, "0");
 		this.stageYTxt.width = 50;
 		this.stageYTxt.height = 20;
-		this.stageXTxt.restrict = "0-9";
+		this.stageYTxt.restrict = "0-9";
 		
 		this.resetStagePosBtn = new PushButton(stagePosPanel, 55, 0, "复位");
 		this.resetStagePosBtn.width = 50;
 		this.resetStagePosBtn.height = 20;
+
+		this.vSlider = new VUISlider(Layer.EDIT, 0, 0, "舞台缩放比");
+		this.vSlider.x = this.aniPanelWidth - 70;
+		this.vSlider.y = stagePosPanel.y + stagePosPanel.height;
+		this.vSlider.minimum = 0;
+		this.vSlider.maximum = 100;
+		this.vSlider.value = 100;
 		
 		this.clearBtn = new PushButton(topGroup, 0, 0, "清理");
 		this.clearBtn.setSize(this.openBtn.width, this.openBtn.height);

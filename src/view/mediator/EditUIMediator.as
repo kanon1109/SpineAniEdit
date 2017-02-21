@@ -80,7 +80,7 @@ public class EditUIMediator extends Mediator
 			this.initEvent();
 			this.initRes();
 			this.drawAniStage();
-			this.setStagePos(0, 0); 
+			this.resetStagePosBtnClickHandler(null);
 			break;
 		case Message.SELECT: 
 			this.editUI.showCtrlPanel(true);
@@ -180,8 +180,7 @@ public class EditUIMediator extends Mediator
 		this.editUI.stageXTxt.addEventListener(FocusEvent.FOCUS_OUT, stageXTxtfocusOutHandler);
 		this.editUI.stageYTxt.addEventListener(FocusEvent.FOCUS_OUT, stageYTxtfocusOutHandler);
 		this.editUI.resetStagePosBtn.addEventListener(MouseEvent.CLICK, resetStagePosBtnClickHandler);
-
-		
+		this.editUI.vSlider.addEventListener(Event.CHANGE, vSliderChangeHandler);
 		this.editUI.showCtrlPanel(false);
 		
 		Layer.STAGE.addEventListener(KeyboardEvent.KEY_UP, onKeyUpHandler);
@@ -698,6 +697,14 @@ public class EditUIMediator extends Mediator
 	{
 		this.save(false);
 	}
+		
+	private function vSliderChangeHandler(event:Event):void 
+	{
+		Layer.ANI_STAGE.scaleX = this.editUI.vSlider.value / 100;
+		Layer.ANI_STAGE.scaleY = Layer.ANI_STAGE.scaleX;
+		Layer.CANVAS.scaleX = Layer.ANI_STAGE.scaleX;
+		Layer.CANVAS.scaleY = Layer.ANI_STAGE.scaleY;
+	}
 	
 	/**
 	 * 保存
@@ -915,7 +922,7 @@ public class EditUIMediator extends Mediator
 				this.stageWidth = data.stageWidth;
 				this.stageHeight = data.stageHeight;
 				this.drawAniStage();
-				this.setStagePos(0, 0);
+				this.resetStagePosBtnClickHandler(null);
 			}
 		}
 	}
