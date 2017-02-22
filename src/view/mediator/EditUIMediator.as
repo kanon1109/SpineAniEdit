@@ -18,7 +18,6 @@ import flash.filesystem.File;
 import flash.filesystem.FileMode;
 import flash.filesystem.FileStream;
 import flash.net.FileFilter;
-import flash.net.URLLoader;
 import flash.ui.Keyboard;
 import flash.ui.Mouse;
 import flash.ui.MouseCursor;
@@ -55,7 +54,6 @@ public class EditUIMediator extends Mediator
 	private var stageSizeWin:StageSizeWindow;
 	private var pathList:Array;
 	private var curSpt:Sprite;
-	private var dataLoader:URLLoader;
 	private var imageFilter:FileFilter;
 	private var dataFilter:FileFilter;
 	private var saveDataStr:String;
@@ -418,7 +416,7 @@ public class EditUIMediator extends Mediator
 	{
 		var fileStream:FileStream = new FileStream();
 		fileStream.open(this.dataFile, FileMode.READ);
-		var dataStr:String = fileStream.readMultiByte(fileStream.bytesAvailable, File.systemCharset);
+		var dataStr:String = fileStream.readUTFBytes(fileStream.bytesAvailable);
 		this.parsing(dataStr);
 	}
 	
@@ -868,6 +866,7 @@ public class EditUIMediator extends Mediator
 	 */
 	private function parsing(dataStr:String):void
 	{
+		trace("dataStr", dataStr);
 		var arr:Array = JSON.parse(dataStr) as Array;
 		var num:int = arr.length;
 		arr.sortOn("orderZ", Array.NUMERIC);
