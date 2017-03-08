@@ -178,8 +178,8 @@ package view.mediator
 			this.editUI.aniCheckBox.addEventListener(MouseEvent.CLICK, aniCheckBoxClickHandler);
 			this.editUI.aniPanel.addEventListener(MouseEvent.MOUSE_DOWN, stageMouseDownHandler);
 			
-			this.editUI.stageXTxt.addEventListener(FocusEvent.FOCUS_OUT, stageXTxtfocusOutHandler);
-			this.editUI.stageYTxt.addEventListener(FocusEvent.FOCUS_OUT, stageYTxtfocusOutHandler);
+			this.editUI.stageXTxt.addEventListener(FocusEvent.FOCUS_OUT, stageTxtfocusOutHandler);
+			this.editUI.stageYTxt.addEventListener(FocusEvent.FOCUS_OUT, stageTxtfocusOutHandler);
 			this.editUI.resetStagePosBtn.addEventListener(MouseEvent.CLICK, resetStagePosBtnClickHandler);
 			this.editUI.vSlider.addEventListener(Event.CHANGE, vSliderChangeHandler);
 			this.editUI.showCtrlPanel(false);
@@ -213,16 +213,13 @@ package view.mediator
 				this.editUI.updateStagePos(0, 0);
 		}
 		
-		private function stageYTxtfocusOutHandler(event:FocusEvent):void
+		private function stageTxtfocusOutHandler(event:FocusEvent):void
 		{
+			if (isNaN(int(this.editUI.stageXTxt.text))) this.editUI.stageXTxt.text = "0";
+			if (isNaN(int(this.editUI.stageYTxt.text))) this.editUI.stageYTxt.text = "0";
 			this.setStagePos(int(this.editUI.stageXTxt.text), int(this.editUI.stageYTxt.text));
 		}
-		
-		private function stageXTxtfocusOutHandler(event:FocusEvent):void
-		{
-			this.setStagePos(int(this.editUI.stageXTxt.text), int(this.editUI.stageYTxt.text));
-		}
-		
+
 		private function stageBtnHandler(event:MouseEvent):void
 		{
 			if (!this.stageSizeWin)
@@ -337,7 +334,6 @@ package view.mediator
 		private function posXTxtfocusOutHandler(event:FocusEvent):void
 		{
 			this.updateSptProp();
-		
 		}
 		
 		/**
@@ -683,6 +679,9 @@ package view.mediator
 			if (!this.curSpt) return;
 			if (isNaN(Number(this.editUI.scaleXTxt.text))) this.editUI.scaleXTxt.text = "100";
 			if (isNaN(Number(this.editUI.scaleYTxt.text))) this.editUI.scaleYTxt.text = "100";
+			if (isNaN(Number(this.editUI.rotationTxt.text))) this.editUI.rotationTxt.text = "0";
+			if (isNaN(Number(this.editUI.posXTxt.text))) this.editUI.posXTxt.text = "0";
+			if (isNaN(Number(this.editUI.posYTxt.text))) this.editUI.posYTxt.text = "0";
 			this.curSpt.scaleX = Number(this.editUI.scaleXTxt.text) / 100;
 			this.curSpt.scaleY = Number(this.editUI.scaleYTxt.text) / 100;
 			this.curSpt.rotation = Number(this.editUI.rotationTxt.text);

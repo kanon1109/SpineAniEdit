@@ -162,12 +162,12 @@ public class EditUI extends Sprite
 		this.stageXTxt = new InputText(stagePosPanel, 0, 25, "0");
 		this.stageXTxt.width = 50;
 		this.stageXTxt.height = 20;
-		this.stageXTxt.restrict = "0-9";
+		this.stageXTxt.restrict = "0-9\\-";
 		
 		this.stageYTxt = new InputText(stagePosPanel, 55, 25, "0");
 		this.stageYTxt.width = 50;
 		this.stageYTxt.height = 20;
-		this.stageYTxt.restrict = "0-9";
+		this.stageYTxt.restrict = "0-9\\-";
 		
 		this.resetStagePosBtn = new PushButton(stagePosPanel, 55, 0, "复位");
 		this.resetStagePosBtn.width = 50;
@@ -213,11 +213,13 @@ public class EditUI extends Sprite
 		
 		var posXLabel:Label = new Label(this.ctrlBox1, 0, 0, "x");
 		this.posXTxt = new InputText(this.ctrlBox1, 0, 0, "0");
+		this.posXTxt.restrict = "0-9\\-";
 		this.posXTxt.width = this.scaleXTxt.width;
 		this.posXTxt.height = 20;
 		
 		var posYLabel:Label = new Label(this.ctrlBox1, 0, 0, "y");
 		this.posYTxt = new InputText(this.ctrlBox1, 0, 0, "0");
+		this.posYTxt.restrict = "0-9\\-";
 		this.posYTxt.width = this.scaleXTxt.width;
 		this.posYTxt.height = 20;
 		
