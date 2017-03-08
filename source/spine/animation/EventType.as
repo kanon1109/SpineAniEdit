@@ -29,35 +29,13 @@
  *****************************************************************************/
 
 package spine.animation {
-	public class Listeners {
-		private var _listeners:Vector.<Function> = new Vector.<Function>();
 
-		public function Listeners () {
-		}
-
-		public function get listeners () : Vector.<Function> {
-			return _listeners;
-		}
-
-		public function add (listener:Function) : void {
-			if (listener == null)
-				throw new ArgumentError("listener cannot be null.");
-			var indexOf:int = _listeners.indexOf(listener);
-			if (indexOf == -1)
-				_listeners[_listeners.length] = listener;
-		}
-
-		public function remove (listener:Function) : void {
-			if (listener == null)
-				throw new ArgumentError("listener cannot be null.");
-			var indexOf:int = _listeners.indexOf(listener);
-			if (indexOf != -1)
-				_listeners.splice(_listeners.indexOf(listener), 1);
-		}
-
-		public function invoke (... args:*) : void {
-			for each (var listener:Function in _listeners)
-				listener.apply(null, args);
-		}
-	}
+public class EventType {
+	public static const start:EventType = new EventType();
+	public static const interrupt:EventType = new EventType();
+	public static const end:EventType = new EventType();
+	public static const dispose:EventType = new EventType();
+	public static const complete:EventType = new EventType();
+	public static const event:EventType = new EventType();
+}
 }

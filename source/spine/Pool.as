@@ -28,36 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.animation {
-	public class Listeners {
-		private var _listeners:Vector.<Function> = new Vector.<Function>();
-
-		public function Listeners () {
-		}
-
-		public function get listeners () : Vector.<Function> {
-			return _listeners;
-		}
-
-		public function add (listener:Function) : void {
-			if (listener == null)
-				throw new ArgumentError("listener cannot be null.");
-			var indexOf:int = _listeners.indexOf(listener);
-			if (indexOf == -1)
-				_listeners[_listeners.length] = listener;
-		}
-
-		public function remove (listener:Function) : void {
-			if (listener == null)
-				throw new ArgumentError("listener cannot be null.");
-			var indexOf:int = _listeners.indexOf(listener);
-			if (indexOf != -1)
-				_listeners.splice(_listeners.indexOf(listener), 1);
-		}
-
-		public function invoke (... args:*) : void {
-			for each (var listener:Function in _listeners)
-				listener.apply(null, args);
+package spine {
+	
+public class Pool {
+	internal var items:Vector.<Object> = new Vector.<Object>();
+	internal var instantiator:Function;
+	
+	public function Pool(instantiator:Function) {
+		this.instantiator = instantiator;
+	}
+	
+	public function obtain (): Object {
+		return this.items.length > 0 ? this.items.pop() : this.instantiator();
+	}
+	
+	public function free (item:Object):void {
+		if (item is Poolable) Poolable(item).reset();
+		items.push(item);
+	}
+	
+	public function freeAll (items:Vector):void {
+		for (var i:int = 0; i < items.length; i++) {
+			free(items[i]);
 		}
 	}
+	
+	public function clear ():void {
+		items.length = 0;
+	}
+}
 }

@@ -28,36 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.animation {
-	public class Listeners {
-		private var _listeners:Vector.<Function> = new Vector.<Function>();
+package spine {
 
-		public function Listeners () {
-		}
+public class TransformMode {
+	public static const normal:TransformMode = new TransformMode();
+	public static const onlyTranslation:TransformMode = new TransformMode();
+	public static const noRotationOrReflection:TransformMode = new TransformMode();
+	public static const noScale:TransformMode = new TransformMode();
+	public static const noScaleOrReflection:TransformMode = new TransformMode();
+}
 
-		public function get listeners () : Vector.<Function> {
-			return _listeners;
-		}
-
-		public function add (listener:Function) : void {
-			if (listener == null)
-				throw new ArgumentError("listener cannot be null.");
-			var indexOf:int = _listeners.indexOf(listener);
-			if (indexOf == -1)
-				_listeners[_listeners.length] = listener;
-		}
-
-		public function remove (listener:Function) : void {
-			if (listener == null)
-				throw new ArgumentError("listener cannot be null.");
-			var indexOf:int = _listeners.indexOf(listener);
-			if (indexOf != -1)
-				_listeners.splice(_listeners.indexOf(listener), 1);
-		}
-
-		public function invoke (... args:*) : void {
-			for each (var listener:Function in _listeners)
-				listener.apply(null, args);
-		}
-	}
 }

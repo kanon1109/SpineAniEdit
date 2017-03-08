@@ -48,9 +48,14 @@ public class EditUI extends Sprite
 	public var aniPanel:Panel;
 	public var aniComboBox:ComboBox;
 	public var aniCheckBox:CheckBox;
+	public var flipHBtn:PushButton;
+	public var flipVBtn:PushButton;
 	private var aniPanelWidth:int;
 	private var aniPanelHeight:int;
-	private var ctrlBox:HBox;
+	private var ctrlBox:VBox;
+	private var ctrlBox1:HBox;
+	private var ctrlBox2:HBox;
+	
 	//private var outputLabel:Label;
 	private var outputLabel:TextField;
 	//中心点位置
@@ -181,37 +186,48 @@ public class EditUI extends Sprite
 		this.stageBtn = new PushButton(topGroup, 0, 0, "舞台大小");
 		this.stageBtn.setSize(this.openBtn.width, this.openBtn.height);
 		
-		this.ctrlBox = new HBox(ctrlPanel);
-		this.ctrlBox.alignment = HBox.MIDDLE;
-		var scaleXLabel:Label = new Label(this.ctrlBox, 0, 0, "scaleX");
-		this.scaleXTxt = new InputText(this.ctrlBox, 0, 0, "100");
-		var scaleYLabel:Label = new Label(this.ctrlBox, 0, 0, "scaleY");
-		this.scaleYTxt = new InputText(this.ctrlBox, 0, 0, "100");
+		this.ctrlBox = new VBox(ctrlPanel);
+		this.ctrlBox1 = new HBox(ctrlBox);
+		this.ctrlBox2 = new HBox(ctrlBox);
+		
+		this.ctrlBox1.alignment = HBox.MIDDLE;
+		this.ctrlBox2.alignment = HBox.MIDDLE;
+		
+		var scaleXLabel:Label = new Label(this.ctrlBox1, 0, 0, "scaleX");
+		this.scaleXTxt = new InputText(this.ctrlBox1, 0, 0, "100");
+		var scaleYLabel:Label = new Label(this.ctrlBox1, 0, 0, "scaleY");
+		this.scaleYTxt = new InputText(this.ctrlBox1, 0, 0, "100");
 		this.scaleXTxt.width = 50;
 		this.scaleYTxt.width = this.scaleXTxt.width;
 		this.scaleXTxt.height = 20;
 		this.scaleYTxt.height = this.scaleXTxt.height;
-		this.scaleXTxt.restrict = "0-9";
-		this.scaleYTxt.restrict = "0-9";
-		this.scaleXTxt.maxChars = 3;
-		this.scaleYTxt.maxChars = 3;
+		this.scaleXTxt.restrict = "0-9\\-";
+		this.scaleYTxt.restrict = "0-9\\-";
+		this.scaleXTxt.maxChars = 5;
+		this.scaleYTxt.maxChars = 5;
 		
-		var rotationLabel:Label = new Label(this.ctrlBox, 0, 0, "rotation");
-		this.rotationTxt = new InputText(this.ctrlBox, 0, 0, "0");
+		var rotationLabel:Label = new Label(this.ctrlBox1, 0, 0, "rotation");
+		this.rotationTxt = new InputText(this.ctrlBox1, 0, 0, "0");
 		this.rotationTxt.width = this.scaleYTxt.width;
 		this.rotationTxt.height = this.scaleXTxt.height;
 		
-		var posXLabel:Label = new Label(this.ctrlBox, 0, 0, "x");
-		this.posXTxt = new InputText(this.ctrlBox, 0, 0, "0");
+		var posXLabel:Label = new Label(this.ctrlBox1, 0, 0, "x");
+		this.posXTxt = new InputText(this.ctrlBox1, 0, 0, "0");
 		this.posXTxt.width = this.scaleXTxt.width;
 		this.posXTxt.height = 20;
 		
-		var posYLabel:Label = new Label(this.ctrlBox, 0, 0, "y");
-		this.posYTxt = new InputText(this.ctrlBox, 0, 0, "0");
+		var posYLabel:Label = new Label(this.ctrlBox1, 0, 0, "y");
+		this.posYTxt = new InputText(this.ctrlBox1, 0, 0, "0");
 		this.posYTxt.width = this.scaleXTxt.width;
 		this.posYTxt.height = 20;
+		
+		this.flipHBtn = new PushButton(this.ctrlBox2, 0, 0, "水平翻转");
+		this.flipHBtn.setSize(this.openBtn.width, this.openBtn.height);
 
-		this.resetBtn = new PushButton(this.ctrlBox, 0, 0, "重置");
+		this.flipVBtn = new PushButton(this.ctrlBox2, 0, 0, "垂直翻转");
+		this.flipVBtn.setSize(this.openBtn.width, this.openBtn.height);
+		
+		this.resetBtn = new PushButton(this.ctrlBox2, 0, 0, "重置");
 		this.resetBtn.setSize(this.openBtn.width, this.openBtn.height);
 		
 		var outPutPanel:Panel = new Panel(ctrlPanel);
@@ -229,11 +245,11 @@ public class EditUI extends Sprite
 
 		outPutPanel.addChild(this.outputLabel);
 		
-		this.aniComboBox = new ComboBox(ctrlBox, 0, 0);
+		this.aniComboBox = new ComboBox(ctrlBox1, 0, 0);
 		this.aniComboBox.openPosition = ComboBox.TOP;
 		this.aniComboBox.width = 100;
 		
-		this.aniCheckBox = new CheckBox(ctrlBox, 0, 0, "是否循环");
+		this.aniCheckBox = new CheckBox(ctrlBox1, 0, 0, "是否循环");
 		this.aniCheckBox.selected = true;
 		
 		this._centerPos = new Point(rootGroup.x + this.aniPanel.width / 2, 
