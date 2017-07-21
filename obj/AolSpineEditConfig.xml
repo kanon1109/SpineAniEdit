@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2017/3/8'</value>
+      <value>'2017/7/7'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -32,16 +32,16 @@
     </define>
     <verbose-stacktraces>true</verbose-stacktraces>
     <source-path append="true">
-      <path-element>D:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\src</path-element>
-      <path-element>D:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\source</path-element>
-      <path-element>d:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
+      <path-element>F:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\src</path-element>
+      <path-element>F:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\source</path-element>
+      <path-element>F:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
     <library-path append="true">
-      <path-element>D:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\lib\PureMVC_AS3_2_0_4.swc</path-element>
+      <path-element>F:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\lib\PureMVC_AS3_2_0_4.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>
-    <path-element>D:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\src\Main.as</path-element>
+    <path-element>F:\workspace\kanon\myProject\flash\AolSpineEdit\AolSpineEdit\src\Main.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

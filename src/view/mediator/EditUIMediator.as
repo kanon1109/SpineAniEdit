@@ -197,7 +197,6 @@ package view.mediator
 		{
 			if (this.curSpt) this.curSpt.scaleY = -this.curSpt.scaleY;
 			this.editUI.setCtrlProp(this.curSpt);
-
 		}
 		
 		private function flipHBtnHandler(event:MouseEvent):void
@@ -215,8 +214,8 @@ package view.mediator
 		
 		private function stageTxtfocusOutHandler(event:FocusEvent):void
 		{
-			if (isNaN(int(this.editUI.stageXTxt.text))) this.editUI.stageXTxt.text = "0";
-			if (isNaN(int(this.editUI.stageYTxt.text))) this.editUI.stageYTxt.text = "0";
+			if (isNaN(Number(this.editUI.stageXTxt.text))) this.editUI.stageXTxt.text = "0";
+			if (isNaN(Number(this.editUI.stageYTxt.text))) this.editUI.stageYTxt.text = "0";
 			this.setStagePos(int(this.editUI.stageXTxt.text), int(this.editUI.stageYTxt.text));
 		}
 
