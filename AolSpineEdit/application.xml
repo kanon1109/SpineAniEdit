@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<application xmlns="http://ns.adobe.com/air/application/18.0">
+  <id>AolSpineEdit</id>
+  <versionNumber>1.01</versionNumber>
+  <filename>AolSpineEdit</filename>
+  <name>AolSpineEdit</name>
+  <initialWindow>
+    <title>AolSpineEdit</title>
+    <content>AolSpineEdit.swf</content>
+    <systemChrome>standard</systemChrome>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <minimizable>true</minimizable>
+    <maximizable>true</maximizable>
+    <resizable>true</resizable>
+  </initialWindow>
+  <!-- 
+	More options:
+	http://livedocs.adobe.com/flex/3/html/File_formats_1.html#1043413
+	-->
+  <customUpdateUI>true</customUpdateUI>
+  <icon>
+    <image16x16>icons/AolSpineEdit16.png</image16x16>
+    <image29x29>icons/AolSpineEdit29.png</image29x29>
+    <image32x32>icons/AolSpineEdit32.png</image32x32>
+    <image36x36>icons/AolSpineEdit36.png</image36x36>
+    <image40x40>icons/AolSpineEdit40.png</image40x40>
+    <image48x48>icons/AolSpineEdit48.png</image48x48>
+    <image50x50>icons/AolSpineEdit50.png</image50x50>
+    <image57x57>icons/AolSpineEdit57.png</image57x57>
+    <image58x58>icons/AolSpineEdit58.png</image58x58>
+    <image72x72>icons/AolSpineEdit72.png</image72x72>
+    <image76x76>icons/AolSpineEdit76.png</image76x76>
+    <image80x80>icons/AolSpineEdit80.png</image80x80>
+    <image87x87>icons/AolSpineEdit87.png</image87x87>
+    <image96x96>icons/AolSpineEdit96.png</image96x96>
+    <image100x100>icons/AolSpineEdit100.png</image100x100>
+    <image114x114>icons/AolSpineEdit114.png</image114x114>
+  </icon>
+  <android>
+    <manifestAdditions><![CDATA[<manifest android:installLocation="auto" xmlns:android="http://schemas.android.com/apk/res/android" />]]></manifestAdditions>
+  </android>
+</application>
