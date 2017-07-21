@@ -9,6 +9,7 @@ public class StartupCommand extends MacroCommand
 {	
 	override protected function initializeMacroCommand():void 
 	{
+		this.addSubCommand(ModelCommand);		
 		this.addSubCommand(ViewCommand);		
 		super.initializeMacroCommand();
 	}

@@ -325,8 +325,9 @@ public class EditUI extends Sprite
 		{
 			this.setAniList(SpineAni(spt).getAnimations());
 			this.aniCheckBox.selected = SpineAni(spt).isLoop;
+			if (this.aniComboBox.selectedIndex != SpineAni(spt).animationIndex)
+				this.aniComboBox.selectedIndex = SpineAni(spt).animationIndex;
 			this.aniComboBox.defaultLabel = SpineAni(spt).animationName;
-			this.aniComboBox.selectedIndex = SpineAni(spt).animationIndex;
 		}
 	}
 	

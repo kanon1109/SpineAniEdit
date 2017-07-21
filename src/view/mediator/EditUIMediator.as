@@ -23,6 +23,8 @@ package view.mediator
 	import flash.ui.MouseCursor;
 	import flash.utils.Dictionary;
 	import message.Message;
+	import model.proxy.HistoryProxy;
+	import model.vo.HistoryVo;
 	import org.puremvc.as3.interfaces.INotification;
 	import org.puremvc.as3.patterns.mediator.Mediator;
 	import utils.AdvanceColorUtil;
@@ -60,10 +62,12 @@ package view.mediator
 		private var stageWidth:Number = 550;
 		private var stageHeight:Number = 600;
 		private var isOnSpaceKey:Boolean;
-		
+		private var historyProxy:HistoryProxy;
+		private var curHistoryVo:HistoryVo;
 		public function EditUIMediator()
 		{
 			super(NAME);
+			this.historyProxy = this.facade.retrieveProxy(HistoryProxy.NAME) as HistoryProxy;
 		}
 		
 		override public function listNotificationInterests():Array
@@ -174,6 +178,8 @@ package view.mediator
 			this.editUI.scaleYTxt.addEventListener(FocusEvent.FOCUS_OUT, scaleYTxtfocusOutHandler);
 			this.editUI.rotationTxt.addEventListener(FocusEvent.FOCUS_OUT, rotationTxtfocusOutHandler);
 			this.editUI.transformTool.addEventListener(TransformTool.CONTROL_TRANSFORM_TOOL, transformToolMoveHandler);
+			this.editUI.transformTool.addEventListener(TransformTool.CONTROL_DOWN, transformToolDownHandler);
+			this.editUI.transformTool.addEventListener(TransformTool.CONTROL_UP, transformToolUpHandler);
 			this.editUI.aniComboBox.addEventListener(Event.SELECT, aniComboBoxSelectHandler);
 			this.editUI.aniCheckBox.addEventListener(MouseEvent.CLICK, aniCheckBoxClickHandler);
 			this.editUI.aniPanel.addEventListener(MouseEvent.MOUSE_DOWN, stageMouseDownHandler);
@@ -193,16 +199,32 @@ package view.mediator
 			Layer.STAGE.addEventListener(MouseEvent.MOUSE_UP, aniStageMouseUp);
 		}
 		
+		private function transformToolUpHandler(event:Event):void 
+		{
+			if (this.curSpt && this.curHistoryVo)
+				this.curHistoryVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+		}
+		
+		private function transformToolDownHandler(event:Event):void 
+		{
+			if (this.curSpt)
+				this.curHistoryVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+		}
+		
 		private function flipVBtnHandler(event:MouseEvent):void 
 		{
+			var hVo:HistoryVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
 			if (this.curSpt) this.curSpt.scaleY = -this.curSpt.scaleY;
 			this.editUI.setCtrlProp(this.curSpt);
+			hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
 		}
 		
 		private function flipHBtnHandler(event:MouseEvent):void
 		{
+			var hVo:HistoryVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
 			if (this.curSpt) this.curSpt.scaleX = -this.curSpt.scaleX;
 			this.editUI.setCtrlProp(this.curSpt);
+			hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
 		}
 		
 		private function resetStagePosBtnClickHandler(event:MouseEvent):void
@@ -268,7 +290,11 @@ package view.mediator
 		private function aniCheckBoxClickHandler(event:Event):void
 		{
 			if (this.curSpt && this.curSpt is SpineAni)
+			{
+				var hVo:HistoryVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
 				SpineAni(this.curSpt).isLoop = this.editUI.aniCheckBox.selected;
+				hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
 		}
 		
 		private function aniComboBoxSelectHandler(event:Event):void
@@ -276,7 +302,11 @@ package view.mediator
 			trace("aniComboBoxSelectHandler");
 			if (this.curSpt && this.curSpt is SpineAni)
 			{
+				var hVo:HistoryVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				trace("animationIndex", hVo.animationIndex);
 				SpineAni(this.curSpt).playAni(this.editUI.aniComboBox.selectedIndex, SpineAni(this.curSpt).isLoop);
+				hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+				trace("nextVo.animationIndex", hVo.nextVo.animationIndex);
 			}
 		}
 		
@@ -284,6 +314,7 @@ package view.mediator
 		{
 			if (this.curSpt)
 			{
+				var hVo:HistoryVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
 				this.curSpt.scaleX = 1;
 				this.curSpt.scaleY = 1;
 				this.curSpt.x = 0;
@@ -291,6 +322,7 @@ package view.mediator
 				this.curSpt.rotation = 0;
 				this.editUI.setCtrlProp(this.curSpt);
 				this.checkTransformTool();
+				hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
 			}
 		}
 		
@@ -301,6 +333,7 @@ package view.mediator
 		
 		private function clearBtnHandler(event:MouseEvent):void
 		{
+			this.historyProxy.saveAllDisplayHistory();
 			this.clearAll();
 			this.editUI.showCtrlPanel(false);
 		}
@@ -396,6 +429,7 @@ package view.mediator
 			image.pathName = this.imageFile.nativePath;
 			Layer.ANI_STAGE.addChild(image);
 			image.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
+			this.historyProxy.saveHistory(image, HistoryVo.CREATE);
 		}
 		
 		private function loadImageErrorHandler(event:ErrorEvent):void
@@ -463,6 +497,7 @@ package view.mediator
 			spAni.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
 			spAni.load(path);
 			Layer.ANI_STAGE.addChild(spAni);
+			this.historyProxy.saveHistory(spAni, HistoryVo.CREATE);
 		}
 		
 		private function spAniLoadErrorCompleteHandler(event:ErrorEvent):void
@@ -484,6 +519,7 @@ package view.mediator
 				this.curSpt.stopDrag();
 				this.checkTransformTool();
 				this.editUI.setCtrlProp(this.curSpt);
+				this.curHistoryVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
 				/*if (!this.editUI.isOutSide(Layer.ANI_STAGE.mouseX, Layer.ANI_STAGE.mouseY))
 				   this.removeCurSpt();*/
 			}
@@ -494,6 +530,7 @@ package view.mediator
 			Layer.STAGE.addEventListener(MouseEvent.MOUSE_UP, stageOnMouseUpHandler);
 			Layer.STAGE.addEventListener(Event.ENTER_FRAME, enterFrameHandler);
 			var spAni:Sprite = event.currentTarget as Sprite;
+			this.curHistoryVo = this.historyProxy.saveHistory(spAni, HistoryVo.PROP);
 			spAni.startDrag();
 			this.selectSpAni(spAni);
 			this.sendNotification(Message.SELECT);
@@ -548,6 +585,7 @@ package view.mediator
 		{
 			if (event.keyCode == Keyboard.DELETE)
 			{
+				this.historyProxy.saveHistory(this.curSpt, HistoryVo.DELETE);
 				this.removeCurSpt();
 			}
 			else if (event.keyCode == Keyboard.SPACE)
@@ -559,9 +597,11 @@ package view.mediator
 		
 		private function onKeyDownHandler(event:KeyboardEvent):void
 		{
+			var hVo:HistoryVo;
 			if (event.ctrlKey && event.keyCode == Keyboard.D)
 			{
 				this.copy(this.curSpt);
+				this.historyProxy.saveHistory(this.curSpt, HistoryVo.COPY);
 			}
 			else if (event.keyCode == Keyboard.ENTER)
 			{
@@ -572,6 +612,248 @@ package view.mediator
 				this.isOnSpaceKey = true;
 				Mouse.cursor = MouseCursor.HAND;
 			}
+			else if (event.ctrlKey && event.keyCode == Keyboard.Z)
+			{
+				this.prevHistory();
+			}
+			else if (event.ctrlKey && event.keyCode == Keyboard.Y)
+			{
+				this.nextHistory();
+			}
+			else if (event.ctrlKey && !event.shiftKey && event.keyCode == Keyboard.UP)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				this.swapDepth(false);
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+			else if (event.ctrlKey && !event.shiftKey && event.keyCode == Keyboard.DOWN)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				this.swapDepth(true);
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+			else if (event.ctrlKey && event.shiftKey && event.keyCode == Keyboard.UP)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				this.setSptMaxDepth(this.curSpt, true);
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+			else if (event.ctrlKey && event.shiftKey && event.keyCode == Keyboard.DOWN)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				this.setSptMaxDepth(this.curSpt, false);
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+			else if (event.keyCode == Keyboard.LEFT)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				if (this.curSpt) 
+				{
+					if (event.shiftKey)
+						this.curSpt.x -= 10;
+					else
+						this.curSpt.x--;
+					this.selectSpAni(this.curSpt);
+				}
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+			else if (event.keyCode == Keyboard.RIGHT)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				if (this.curSpt) 
+				{
+					if (event.shiftKey)
+						this.curSpt.x += 10;
+					else
+						this.curSpt.x++;
+					this.selectSpAni(this.curSpt);
+				}
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+			else if (event.keyCode == Keyboard.UP)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				if (this.curSpt) 
+				{
+					if (event.shiftKey)
+						this.curSpt.y -= 10;
+					else
+						this.curSpt.y--;
+					this.selectSpAni(this.curSpt);
+				}	
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+			else if (event.keyCode == Keyboard.DOWN)
+			{
+				hVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
+				if (this.curSpt) 
+				{
+					if (event.shiftKey)
+						this.curSpt.y += 10;
+					else
+						this.curSpt.y++;
+					this.selectSpAni(this.curSpt);
+				}
+				if (hVo)
+					hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
+			}
+		}
+		
+		/**
+		 * 上一步
+		 */
+		private function prevHistory():void
+		{
+			var hVo:HistoryVo = this.historyProxy.prevHistory();
+			if (hVo)
+			{
+				var ani:SpineAni;
+				var image:Image;
+				var spt:Sprite;
+				var count:int;
+				var i:int;
+				if (hVo.type == HistoryVo.DELETE)
+				{
+					//上一步删除
+					if (hVo.target is SpineAni)
+					{
+						ani = hVo.target as SpineAni;
+						ani.x = hVo.x;
+						ani.y = hVo.y;
+						ani.name = hVo.name;
+						ani.animationName = hVo.animationName;
+						ani.play(ani.animationName);
+						this.resetColor(ani);
+						ani.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
+						Layer.ANI_STAGE.addChildAt(ani,  hVo.childIndex);
+					}
+					else if (hVo.target is Image)
+					{
+						image = hVo.target as Image;
+						image.x = hVo.x;
+						image.y = hVo.y;
+						image.name = hVo.name;
+						this.resetColor(image);
+						image.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
+						Layer.ANI_STAGE.addChildAt(image, hVo.childIndex);
+					}
+				}
+				else if (hVo.type == HistoryVo.COPY || 
+						 hVo.type == HistoryVo.CREATE)
+				{	
+					spt = hVo.target as Sprite;
+					this.removeSpt(spt);
+					if (this.curSpt == spt)
+					{
+						this.selectSpAni(null);
+						this.curSpt = null;
+						this.sendNotification(Message.DELETE);
+					}
+				}
+				else if (hVo.type == HistoryVo.PROP)
+				{
+					this.selectSpAni(this.setHistoryVo(hVo));
+				}
+				else if (hVo.type == HistoryVo.CLEAR)
+				{
+					count =	hVo.displayList.length;
+					for (i = 0; i < count; i++) 
+					{
+						spt = hVo.displayList[i];
+						Layer.ANI_STAGE.addChild(spt);
+					}
+				}
+				else if (hVo.type == HistoryVo.ALL_PROP)
+				{
+					var historyVo:HistoryVo;
+					count =	hVo.historyVoList.length;
+					for (i = 0; i < count; i++) 
+					{
+						historyVo = hVo.historyVoList[i];
+						this.setHistoryVo(historyVo);
+					}
+				}
+			}
+		}
+		
+		/**
+		 * 恢复撤销
+		 */
+		private function nextHistory():void
+		{
+			var hVo:HistoryVo = this.historyProxy.nextHistory();
+			if (hVo)
+			{
+				var ani:SpineAni;
+				var spt:Sprite;
+				var nextVo:HistoryVo;
+				if (hVo.type == HistoryVo.DELETE)
+				{
+					this.removeSpt(hVo.target as Sprite);
+				}
+				else if (hVo.type == HistoryVo.COPY || 
+						 hVo.type == HistoryVo.CREATE)
+				{
+					spt = hVo.target as Sprite;
+					this.resetColor(spt);
+					spt.addEventListener(MouseEvent.MOUSE_DOWN, sptOnMouseDownHandler);
+					Layer.ANI_STAGE.addChild(spt);
+				}
+				else if (hVo.type == HistoryVo.PROP)
+				{
+					nextVo = hVo.nextVo;
+					this.selectSpAni(this.setHistoryVo(nextVo));
+				}
+				else if (hVo.type == HistoryVo.CLEAR)
+				{
+					this.clearAll();
+				}
+				else  if (hVo.type == HistoryVo.ALL_PROP)
+				{
+					nextVo = hVo.nextVo;
+					var historyVo:HistoryVo;
+					var count:int =	nextVo.historyVoList.length;
+					for (var i:int = 0; i < count; i++) 
+					{
+						historyVo = nextVo.historyVoList[i];
+						this.setHistoryVo(historyVo);
+					}
+				}
+			}
+		}
+		
+		/**
+		 * 设置历史数据
+		 * @param	hVo	数据
+		 * @return
+		 */
+		private function setHistoryVo(hVo:HistoryVo):Sprite
+		{
+			if (!hVo) return null;
+			var spt:Sprite = hVo.target as Sprite;
+			spt.parent.setChildIndex(spt, hVo.childIndex);
+			spt.x = hVo.x;
+			spt.y = hVo.y;
+			spt.scaleX = hVo.scaleX;
+			spt.scaleY = hVo.scaleY;
+			spt.rotation = hVo.rotation;
+			spt.name = hVo.name;
+			if (hVo.target is SpineAni)
+			{
+				var ani:SpineAni = hVo.target as SpineAni;
+				ani.isLoop = hVo.isLoop;
+				ani.animationName = hVo.animationName;
+				trace("hVo.animationIndex", hVo.animationIndex);
+				ani.playAni(hVo.animationIndex, ani.isLoop);
+			}
+			return spt;
 		}
 		
 		private function refreshBtnHandler(event:MouseEvent):void
@@ -586,14 +868,26 @@ package view.mediator
 		
 		private function highestDepthBtnHandler(event:MouseEvent):void
 		{
-			if (this.curSpt)
-				this.curSpt.parent.addChild(this.curSpt);
+			this.setSptMaxDepth(this.curSpt, true);
 		}
 		
 		private function lowestDepthBtnHandler(event:MouseEvent):void
 		{
-			if (this.curSpt)
-				this.curSpt.parent.setChildIndex(this.curSpt, 0);
+			this.setSptMaxDepth(this.curSpt, false);
+		}
+		
+		/**
+		 * 设置最高或最低深度
+		 * @param	spt		显示对象
+		 * @param	flag	最高或最低深度
+		 */
+		private function setSptMaxDepth(spt:Sprite, flag:Boolean):void
+		{
+			if (!spt || !spt.parent) return;
+			var index:int = spt.parent.getChildIndex(spt);
+			if (flag) index = spt.parent.numChildren - 1;
+			else index = 0;
+			spt.parent.setChildIndex(spt, index);
 		}
 		
 		/**
@@ -676,6 +970,7 @@ package view.mediator
 		private function updateSptProp():void
 		{
 			if (!this.curSpt) return;
+			var hVo:HistoryVo = this.historyProxy.saveHistory(this.curSpt, HistoryVo.PROP);
 			if (isNaN(Number(this.editUI.scaleXTxt.text))) this.editUI.scaleXTxt.text = "100";
 			if (isNaN(Number(this.editUI.scaleYTxt.text))) this.editUI.scaleYTxt.text = "100";
 			if (isNaN(Number(this.editUI.rotationTxt.text))) this.editUI.rotationTxt.text = "0";
@@ -686,6 +981,7 @@ package view.mediator
 			this.curSpt.rotation = Number(this.editUI.rotationTxt.text);
 			this.curSpt.x = Number(this.editUI.posXTxt.text);
 			this.curSpt.y = Number(this.editUI.posYTxt.text);
+			hVo.nextVo = this.historyProxy.saveNextHistory(this.curSpt);
 		}
 		
 		/**
@@ -842,6 +1138,15 @@ package view.mediator
 		}
 		
 		/**
+		 * 重置颜色
+		 * @param	spt	显示对象
+		 */
+		private function resetColor(spt:Sprite):void
+		{
+			if (spt) spt.transform.colorTransform = AdvanceColorUtil.setColorInitialize();
+		}
+		
+		/**
 		 * 选中动画
 		 * @param	spAni	选中动画
 		 */
@@ -853,6 +1158,16 @@ package view.mediator
 			this.checkTransformTool();
 			this.editUI.setCtrlProp(this.curSpt);
 			this.editUI.showCtrlPanel(spAni != null);
+		}
+	
+		/**
+		* 删除某个显示对象
+		* @param	spt	显示对象
+		*/
+		private function removeSpt(spt:Sprite):void
+		{
+			if (spt && spt.parent)
+				spt.parent.removeChild(spt);
 		}
 		
 		/**

@@ -362,6 +362,7 @@ public class SpineAni extends Sprite
 	/**
 	 * 动画索引
 	 */
-	public function get animationIndex():int {return _animationIndex;}
+	public function get animationIndex():int {return _animationIndex; }
+
 }
 }
